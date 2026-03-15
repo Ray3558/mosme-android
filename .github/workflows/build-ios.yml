@@ -1,0 +1,84 @@
+name: Build iOS IPA
+
+on:
+  push:
+    branches: [ main, master ]
+    paths:
+      - 'ios/**'
+      - '.github/workflows/build-ios.yml'
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-14
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Setup Xcode
+      uses: maxim-lobanov/setup-xcode@v1
+      with:
+        xcode-version: '15.2'
+
+    - name: Show build environment
+      run: |
+        xcodebuild -version
+        swift --version
+
+    - name: Build and Archive
+      run: |
+        cd ios
+        xcodebuild archive \
+          -project MosmeCheat.xcodeproj \
+          -scheme MosmeCheat \
+          -configuration Release \
+          -sdk iphoneos \
+          -archivePath build/MosmeCheat.xcarchive \
+          CODE_SIGN_IDENTITY="" \
+          CODE_SIGNING_REQUIRED=NO \
+          CODE_SIGNING_ALLOWED=NO \
+          -allowProvisioningUpdates
+
+    - name: Create IPA
+      run: |
+        cd ios
+        mkdir -p build/ipa build/Payload
+
+        # Find and copy .app bundle
+        APP_PATH=$(find build/MosmeCheat.xcarchive -name "*.app" -type d | head -n 1)
+
+        if [ -z "$APP_PATH" ]; then
+          echo "Error: .app bundle not found"
+          exit 1
+        fi
+
+        echo "Found app at: $APP_PATH"
+        cp -r "$APP_PATH" build/Payload/
+
+        # Create IPA
+        cd build
+        zip -r MosmeCheat-unsigned.ipa Payload
+        mv MosmeCheat-unsigned.ipa ipa/MosmeCheat.ipa
+
+        # Show info
+        ls -lh ipa/MosmeCheat.ipa
+        unzip -l ipa/MosmeCheat.ipa | head -20
+
+    - name: Upload IPA
+      uses: actions/upload-artifact@v4
+      with:
+        name: MosmeCheat-iOS-unsigned
+        path: ios/build/ipa/MosmeCheat.ipa
+        retention-days: 30
+
+    - name: Create Release (on tag)
+      if: startsWith(github.ref, 'refs/tags/')
+      uses: softprops/action-gh-release@v1
+      with:
+        files: ios/build/ipa/MosmeCheat.ipa
+        draft: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
