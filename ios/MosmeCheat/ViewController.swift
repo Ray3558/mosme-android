@@ -22,14 +22,23 @@ class ViewController: UIViewController, WKNavigationDelegate, WKUIDelegate {
         config.preferences.javaScriptEnabled = true
         config.preferences.javaScriptCanOpenWindowsAutomatically = true
 
-        webView = WKWebView(frame: view.bounds, configuration: config)
-        webView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+        webView = WKWebView(frame: .zero, configuration: config)
+        webView.translatesAutoresizingMaskIntoConstraints = false
         webView.navigationDelegate = self
         webView.uiDelegate = self
         webView.customUserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
         webView.allowsBackForwardNavigationGestures = true
+        webView.scrollView.contentInsetAdjustmentBehavior = .never
 
         view.addSubview(webView)
+
+        // Use Auto Layout to respect safe area
+        NSLayoutConstraint.activate([
+            webView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            webView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            webView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            webView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+        ])
     }
 
     private func setupAnswerButton() {
@@ -43,6 +52,9 @@ class ViewController: UIViewController, WKNavigationDelegate, WKUIDelegate {
 
         answerButton.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(answerButton)
+
+        // Bring button to front to ensure it's above WebView
+        view.bringSubviewToFront(answerButton)
 
         NSLayoutConstraint.activate([
             answerButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
