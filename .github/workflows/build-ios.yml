@@ -32,14 +32,17 @@ jobs:
       run: |
         cd ios
 
-        # Build with ad-hoc signing to include Swift libraries
+        # Build without signing but ensure Swift libraries are included
         xcodebuild archive \
           -project MosmeCheat.xcodeproj \
           -scheme MosmeCheat \
           -configuration Release \
           -sdk iphoneos \
           -archivePath build/MosmeCheat.xcarchive \
-          CODE_SIGN_IDENTITY="-" \
+          CODE_SIGN_IDENTITY="" \
+          CODE_SIGNING_REQUIRED=NO \
+          CODE_SIGNING_ALLOWED=NO \
+          ENABLE_BITCODE=NO \
           -allowProvisioningUpdates
 
     - name: Create IPA with Swift Libraries
@@ -70,11 +73,18 @@ jobs:
           for lib in libswiftCore.dylib libswiftFoundation.dylib libswiftObjectiveC.dylib \
                      libswiftUIKit.dylib libswiftWebKit.dylib libswiftDispatch.dylib \
                      libswiftCoreFoundation.dylib libswiftCoreGraphics.dylib \
-                     libswiftDarwin.dylib libswift_Concurrency.dylib; do
+                     libswiftDarwin.dylib libswift_Concurrency.dylib libswiftCoreImage.dylib \
+                     libswiftQuartzCore.dylib libswiftMetal.dylib libswiftsimd.dylib \
+                     libswiftCompatibility56.a libswiftCompatibilityDynamicReplacements.a; do
             if [ -f "$SWIFT_LIBS_PATH/$lib" ]; then
+              echo "  Copying $lib"
               cp "$SWIFT_LIBS_PATH/$lib" "build/Payload/MosmeCheat.app/Frameworks/"
             fi
           done
+
+          echo "Swift libraries copied: $(ls -1 build/Payload/MosmeCheat.app/Frameworks/ | wc -l) files"
+        else
+          echo "Warning: Swift libraries path not found"
         fi
 
         # Create IPA
@@ -83,11 +93,15 @@ jobs:
         mv MosmeCheat-unsigned.ipa ipa/MosmeCheat.ipa
 
         # Show info
+        echo ""
         echo "IPA size:"
         ls -lh ipa/MosmeCheat.ipa
         echo ""
-        echo "IPA contents:"
+        echo "IPA contents (first 30 files):"
         unzip -l ipa/MosmeCheat.ipa | head -30
+        echo ""
+        echo "Total files in IPA:"
+        unzip -l ipa/MosmeCheat.ipa | tail -1
 
     - name: Upload IPA
       uses: actions/upload-artifact@v4
