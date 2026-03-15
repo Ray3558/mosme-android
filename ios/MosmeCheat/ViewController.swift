@@ -5,8 +5,6 @@ class ViewController: UIViewController, WKNavigationDelegate, WKUIDelegate {
 
     private var webView: WKWebView!
     private var answerButton: UIButton!
-    private var tapCount = 0
-    private var lastTapTime: TimeInterval = 0
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -57,24 +55,19 @@ class ViewController: UIViewController, WKNavigationDelegate, WKUIDelegate {
     }
 
     private func setupGestureRecognizer() {
-        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(handleTripleTap))
-        tapGesture.numberOfTapsRequired = 1
-        webView.addGestureRecognizer(tapGesture)
+        // Use triple tap gesture recognizer
+        let tripleTapGesture = UITapGestureRecognizer(target: self, action: #selector(handleTripleTap))
+        tripleTapGesture.numberOfTapsRequired = 3
+        tripleTapGesture.cancelsTouchesInView = false
+        view.addGestureRecognizer(tripleTapGesture)
     }
 
     @objc private func handleTripleTap() {
-        let now = Date().timeIntervalSince1970
-        if now - lastTapTime < 0.5 {
-            tapCount += 1
-        } else {
-            tapCount = 1
-        }
-        lastTapTime = now
+        answerButton.isHidden.toggle()
 
-        if tapCount >= 3 {
-            tapCount = 0
-            answerButton.isHidden.toggle()
-        }
+        // Provide haptic feedback
+        let generator = UIImpactFeedbackGenerator(style: .medium)
+        generator.impactOccurred()
     }
 
     @objc private func autoAnswer() {
