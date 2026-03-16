@@ -108,7 +108,7 @@ uv run main.py
 
 3. **簽名並安裝**
    - 詳見 [ios/SIGNING_GUIDE.md](ios/SIGNING_GUIDE.md)
-   - 推薦使用 AltStore（免費）
+   - 推薦使用 iLoader（免費）
 
 完整說明：[QUICKSTART_iOS.md](QUICKSTART_iOS.md)
 
