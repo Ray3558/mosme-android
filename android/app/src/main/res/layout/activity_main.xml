@@ -4,11 +4,133 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <Button
-        android:id="@+id/btnAnswer"
+    <!-- 設定面板（預設隱藏） -->
+    <LinearLayout
+        android:id="@+id/settingsPanel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="8dp"
+        android:background="#222222"
+        android:visibility="gone">
+
+        <EditText
+            android:id="@+id/etBaseUrl"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="API Base URL（如 https://api.openai.com）"
+            android:textColorHint="#888888"
+            android:textColor="#ffffff"
+            android:backgroundTint="#555555"
+            android:inputType="textUri"
+            android:singleLine="true" />
+
+        <EditText
+            android:id="@+id/etApiKey"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="API Key"
+            android:textColorHint="#888888"
+            android:textColor="#ffffff"
+            android:backgroundTint="#555555"
+            android:inputType="textPassword"
+            android:singleLine="true"
+            android:layout_marginTop="4dp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="4dp">
+
+            <Spinner
+                android:id="@+id/spinnerModel"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:backgroundTint="#555555" />
+
+            <Button
+                android:id="@+id/btnFetchModels"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="獲取"
+                android:textSize="12sp"
+                android:layout_marginStart="4dp" />
+        </LinearLayout>
+
+        <CheckBox
+            android:id="@+id/cbPrecise"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="精確模式（逐題+思考鏈，較慢但更準）"
+            android:textColor="#ffffff"
+            android:layout_marginTop="4dp" />
+
+        <CheckBox
+            android:id="@+id/cbMajority"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="多數決模式（每題問3次取多數，最準但3倍慢）"
+            android:textColor="#ffffff"
+            android:layout_marginTop="2dp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="4dp">
+
+            <Button
+                android:id="@+id/btnSaveSettings"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="儲存設定" />
+
+            <Button
+                android:id="@+id/btnCloseSettings"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="關閉"
+                android:layout_marginStart="4dp" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- 控制列（三連點顯示/隱藏） -->
+    <LinearLayout
+        android:id="@+id/controlBar"
         android:layout_width="match_parent"
         android:layout_height="48dp"
-        android:text="自動作答" />
+        android:orientation="horizontal"
+        android:visibility="gone">
+
+        <Button
+            android:id="@+id/btnAnswer"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="自動作答"
+            android:textSize="13sp" />
+
+        <Button
+            android:id="@+id/btnAI"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="AI 作答"
+            android:textSize="13sp"
+            android:layout_marginStart="2dp" />
+
+        <Button
+            android:id="@+id/btnSettingsToggle"
+            android:layout_width="48dp"
+            android:layout_height="match_parent"
+            android:text="⚙"
+            android:textSize="16sp"
+            android:layout_marginStart="2dp" />
+    </LinearLayout>
 
     <WebView
         android:id="@+id/webView"
